@@ -2,40 +2,26 @@
 
 ## 1. Architecture & Database Schema
 
-### Architecture
-- **Framework**: Next.js App Router (unified full-stack application)
-- **Database**: MongoDB hosted on MongoDB Atlas, using Mongoose for schema validation.
-- **State Management**: Zustand for managing global user state (role, available credits).
-- **Payment Integration**: Stripe SDK (Test Mode) for purchasing credits.
+### Architecture (Decoupled Client-Server)
+- **Frontend (`client/`)**: Next.js App Router. Handles UI, routing, and frontend state.
+- **Backend (`server/`)**: Express.js (Node.js). Handles API logic, business rules, and database transactions.
+- **Database**: MongoDB hosted on MongoDB Atlas, shared between both client (for Auth) and server (for Data). Mongoose used in Express for schemas.
+- **State Management**: Zustand for managing global UI state.
+- **Payment Integration**: Stripe SDK (Test Mode).
 
-### Database Models
+### Database Models (Managed by Express Backend)
 
-1. **User**
-   - `name`, `email`, `password`, `photo_url`
-   - `role`: (Admin | Creator | Supporter)
-   - `credits`: Number
-   - `auth_provider`: (Local | Google)
-
+1. **User** (Extended by BetterAuth)
+   - `name`, `email`, `image`, `role` (Admin | Creator | Supporter), `credits`
 2. **Campaign**
    - `title`, `story`, `category`, `funding_goal`, `min_contribution`, `deadline`, `reward_info`, `image_url`
-   - `creator_email`, `creator_name`
-   - `amount_raised`: Number
-   - `status`: (pending | approved | rejected)
-
+   - `creator_email`, `creator_name`, `amount_raised`, `status`
 3. **Contribution**
    - `campaign_id`, `campaign_title`, `amount`
-   - `supporter_email`, `supporter_name`
-   - `creator_name`, `creator_email`
-   - `date`: Date
-   - `status`: (pending | approved | rejected)
-
+   - `supporter_email`, `supporter_name`, `creator_name`, `creator_email`, `date`, `status`
 4. **Withdrawal**
-   - `creator_email`, `creator_name`
-   - `withdrawal_credit`, `withdrawal_amount` (20 credits = $1)
-   - `payment_system`, `account_number`
-   - `date`: Date
-   - `status`: (pending | approved)
-
+   - `creator_email`, `creator_name`, `withdrawal_credit`, `withdrawal_amount`
+   - `payment_system`, `account_number`, `date`, `status`
 5. **Notification**
    - `message`, `toEmail`, `actionRoute`, `time`
 
@@ -43,31 +29,24 @@
 
 ### Tech Stack
 - **Styling**: Tailwind CSS
-- **Components**: Shadcn UI (for accessible UI primitives like modals, dropdowns, and tables)
-- **Animations**: Framer Motion (for page transitions and homepage flair), Swiper Slider (for Hero carousel)
+- **Components**: Shadcn UI
+- **Animations**: Framer Motion, Swiper Slider
 
-### Layouts
-- **Basic Layout**: For public pages (Home, Login, Register, Explore). Includes Navbar and Footer.
-- **Dashboard Layout**: For logged-in users. Includes Navbar, Sidebar (role-specific navigation), Main Content Area, and Footer.
-
-### Key Components
-- **Hero Slider**: Animated carousel displaying featured/top campaigns.
-- **Campaign Cards**: Reusable components displaying campaign summary (image, title, creator, deadline, amount raised).
-- **Notifications Dropdown**: Navbar component that fetches and displays user-specific notifications.
-- **Data Tables**: Used in Creator and Admin dashboards (Manage Campaigns, Withdrawals, Contributions).
-- **Payment Modal**: Stripe Elements form for purchasing credit packages securely.
+### Layouts & Key Components
+- **Client Root**: `client/src/app`
+- **Dashboard Layout**: Navbar + Sidebar (role-specific navigation) + Main Content Area + Footer.
+- **Lib Core**: `client/src/lib/core/` containing `server.ts` (API fetch wrappers) and `session.ts` (session & role guards).
 
 ## 3. API Routes & Authentication Flow
 
-### Authentication Flow & Security Proxy
-- **Strategy**: **BetterAuth** for robust, modern authentication in Next.js. It natively supports type-safe sessions, credential/OAuth login, and extensible plugins.
-- **Providers**: Email/Password and Google OAuth integrations.
-- **Security Proxy**: Next.js **Middleware** will act as a security proxy. It will intercept all incoming requests at the Edge, verify the BetterAuth session, and enforce role-based access control (RBAC). Unauthenticated or unauthorized requests are blocked/redirected before hitting the frontend rendering layer.
-- **Storage**: BetterAuth automatically manages secure HTTP-only cookies for sessions and tokens.
+### Authentication Flow (BetterAuth + Express)
+- **Strategy**: **BetterAuth** runs on the Next.js frontend to handle login, sessions, and OAuth natively. Sessions are stored in the shared MongoDB.
+- **Frontend Protection**: No Next.js Middleware. Instead, `lib/core/session.ts` provides `requireRole` which redirects users if they lack permissions at the page level.
+- **Backend Verification**: Next.js sends the BetterAuth token via the `Authorization: Bearer <token>` header on every request via wrappers in `lib/core/server.ts`. 
+- **Express Security**: The Express backend uses a custom `verifyToken` middleware that parses the header, queries the `sessions` collection in MongoDB to validate the token, and attaches the user object to the request.
 
-### API Routes
-- **`/api/auth/[...all]`**: BetterAuth dynamic API route handling all login, logout, and session validation automatically.
-- **`/api/campaigns`**: CRUD for campaigns. Additional routes for Admin approval (`/api/campaigns/[id]/approve`).
-- **`/api/contributions`**: Creating contributions (Supporter) and approving/rejecting (Creator).
-- **`/api/withdrawals`**: Submitting requests (Creator) and approving them (Admin).
-- **`/api/payments/create-intent`**: Stripe integration to facilitate credit purchases.
+### API Routes (Express Server)
+- **`/api/campaigns`**: CRUD for campaigns. Admin approval (`/api/campaigns/:id/approve`).
+- **`/api/contributions`**: Creating contributions and approving/rejecting.
+- **`/api/withdrawals`**: Submitting requests and approving them.
+- **`/api/payments/create-intent`**: Stripe integration.
