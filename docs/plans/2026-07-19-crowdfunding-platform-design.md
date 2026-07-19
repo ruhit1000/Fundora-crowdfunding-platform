@@ -60,13 +60,13 @@
 ## 3. API Routes & Authentication Flow
 
 ### Authentication Flow & Security Proxy
-- **Strategy**: **NextAuth.js (Auth.js)** for robust, production-ready authentication. It seamlessly handles session management, JWT encryption, and OAuth integrations.
-- **Providers**: Credentials Provider (Email/Password) and Google OAuth Provider.
-- **Security Proxy**: Next.js **Middleware** will act as a security proxy. It will intercept all incoming requests at the Edge, verify the NextAuth session, and enforce role-based access control (RBAC). Unauthenticated or unauthorized requests are blocked/redirected before hitting the frontend rendering layer. (If a separate backend is used later, Next.js `rewrites` will be configured to proxy API requests to hide the backend URL).
-- **Storage**: NextAuth automatically manages secure, encrypted HTTP-only cookies.
+- **Strategy**: **BetterAuth** for robust, modern authentication in Next.js. It natively supports type-safe sessions, credential/OAuth login, and extensible plugins.
+- **Providers**: Email/Password and Google OAuth integrations.
+- **Security Proxy**: Next.js **Middleware** will act as a security proxy. It will intercept all incoming requests at the Edge, verify the BetterAuth session, and enforce role-based access control (RBAC). Unauthenticated or unauthorized requests are blocked/redirected before hitting the frontend rendering layer.
+- **Storage**: BetterAuth automatically manages secure HTTP-only cookies for sessions and tokens.
 
 ### API Routes
-- **`/api/auth/[...nextauth]`**: NextAuth dynamic route handling all login, logout, and session validation automatically.
+- **`/api/auth/[...all]`**: BetterAuth dynamic API route handling all login, logout, and session validation automatically.
 - **`/api/campaigns`**: CRUD for campaigns. Additional routes for Admin approval (`/api/campaigns/[id]/approve`).
 - **`/api/contributions`**: Creating contributions (Supporter) and approving/rejecting (Creator).
 - **`/api/withdrawals`**: Submitting requests (Creator) and approving them (Admin).
