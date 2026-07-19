@@ -59,13 +59,14 @@
 
 ## 3. API Routes & Authentication Flow
 
-### Authentication Flow
-- **Strategy**: Custom JWT authentication with Google Sign-In support.
-- **Storage**: JWT is securely stored in **HTTP-only cookies** (overriding the initial `localStorage` requirement for better security based on user preference).
-- **Middleware**: Next.js Middleware reads the HTTP-only cookie, decodes the token, and verifies role permissions before allowing access to protected routes or API endpoints.
+### Authentication Flow & Security Proxy
+- **Strategy**: **NextAuth.js (Auth.js)** for robust, production-ready authentication. It seamlessly handles session management, JWT encryption, and OAuth integrations.
+- **Providers**: Credentials Provider (Email/Password) and Google OAuth Provider.
+- **Security Proxy**: Next.js **Middleware** will act as a security proxy. It will intercept all incoming requests at the Edge, verify the NextAuth session, and enforce role-based access control (RBAC). Unauthenticated or unauthorized requests are blocked/redirected before hitting the frontend rendering layer. (If a separate backend is used later, Next.js `rewrites` will be configured to proxy API requests to hide the backend URL).
+- **Storage**: NextAuth automatically manages secure, encrypted HTTP-only cookies.
 
 ### API Routes
-- **`/api/auth/register` & `/api/auth/login`**: Handles user creation and JWT generation.
+- **`/api/auth/[...nextauth]`**: NextAuth dynamic route handling all login, logout, and session validation automatically.
 - **`/api/campaigns`**: CRUD for campaigns. Additional routes for Admin approval (`/api/campaigns/[id]/approve`).
 - **`/api/contributions`**: Creating contributions (Supporter) and approving/rejecting (Creator).
 - **`/api/withdrawals`**: Submitting requests (Creator) and approving them (Admin).
