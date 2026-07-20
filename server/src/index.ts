@@ -64,6 +64,10 @@ export const verifyToken = async (
   }
 };
 
+import campaignRoutes from "./routes/campaignRoutes";
+
+app.use("/api/campaigns", campaignRoutes);
+
 app.get("/health", (req, res) => {
   res.json({ status: "healthy", dbState: mongoose.connection.readyState });
 });

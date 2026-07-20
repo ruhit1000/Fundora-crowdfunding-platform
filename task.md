@@ -13,9 +13,9 @@
 | batch-2-1 | Setup Shadcn UI | completed | |
 | batch-2-2 | Build Base Layouts (Navbar, Footer, Sidebar) | completed | |
 | batch-2-3 | Build Auth Pages (/login, /register) | completed | |
-| batch-3-1 | Implement Campaign API Routes (Express) | pending | |
-| batch-3-2 | Build Explore Campaigns Page (Client) | pending | |
-| batch-3-3 | Build Campaign Details & Contribution Flow (Client) | pending | |
+| batch-3-1 | Implement Campaign API Routes (Express) | completed | |
+| batch-3-2 | Build Explore Campaigns Page (Client) | completed | |
+| batch-3-3 | Build Campaign Details & Contribution Flow (Client) | completed | |
 | batch-4-1 | Implement Dashboard API Routes (Express) | pending | |
 | batch-4-2 | Build Creator Dashboard Pages (Client) | pending | |
 | batch-4-3 | Build Supporter Dashboard Pages (Client - inc. Pagination) | pending | |
