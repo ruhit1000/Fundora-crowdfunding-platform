@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface IUser extends Document {
+export interface IUser extends Document<string> {
   _id: string; // BetterAuth uses string IDs
   name: string;
   email: string;
