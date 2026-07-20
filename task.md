@@ -10,9 +10,9 @@
 | batch-1-6 | Install & Configure BetterAuth in Client | completed | |
 | batch-1-7 | Implement client/src/lib/core/session.ts | completed | |
 | batch-1-8 | Implement client/src/lib/core/server.ts | completed | |
-| batch-2-1 | Setup Shadcn UI | pending | |
-| batch-2-2 | Build Base Layouts (Navbar, Footer, Sidebar) | pending | |
-| batch-2-3 | Build Auth Pages (/login, /register) | pending | |
+| batch-2-1 | Setup Shadcn UI | completed | |
+| batch-2-2 | Build Base Layouts (Navbar, Footer, Sidebar) | completed | |
+| batch-2-3 | Build Auth Pages (/login, /register) | completed | |
 | batch-3-1 | Implement Campaign API Routes (Express) | pending | |
 | batch-3-2 | Build Explore Campaigns Page (Client) | pending | |
 | batch-3-3 | Build Campaign Details & Contribution Flow (Client) | pending | |
