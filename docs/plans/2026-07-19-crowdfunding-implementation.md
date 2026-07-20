@@ -2,129 +2,105 @@
 
 > **For Antigravity:** REQUIRED WORKFLOW: Use `.agent/workflows/execute-plan.md` to execute this plan in single-flow mode.
 
-**Goal:** Build a decoupled crowdfunding platform with a Next.js frontend (client) and an Express.js backend (server), using BetterAuth for session management.
+**Goal:** Build a decoupled crowdfunding platform (Next.js client, Express server) that 100% fulfills all core and optional requirements (Stripe, imgBB, Pagination, Notifications, Search/Filter).
 
 **Architecture:** 
-- `client/`: Next.js App Router, Tailwind CSS, Shadcn UI, BetterAuth. Uses a `lib/core` folder with `server.ts` for fetch wrappers passing `Authorization` headers, and `session.ts` for frontend route protection (no middleware folder).
-- `server/`: Express.js, MongoDB Native/Mongoose. Exposes REST API and secures endpoints using a `verifyToken` middleware that validates the BetterAuth token against the DB.
+- `client/`: Next.js App Router, Tailwind CSS, Shadcn UI, BetterAuth. Uses `lib/core/server.ts` for fetch wrappers.
+- `server/`: Express.js, MongoDB/Mongoose. Exposes REST API secured by `verifyToken` middleware.
 
 ---
 
-### Task 1: Project Scaffolding
+### Batch 1: Setup, Database & Core Auth
 
-**Files:**
-- Create: `client/package.json`
-- Create: `server/package.json`
+**Task 1-1 & 1-2: Scaffolding** *(Completed)*
+- Next.js client and Express server created.
 
-**Step 1: Scaffold Next.js Client**
-Run: `npx create-next-app@latest client --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm`
-Expected: Next.js project created in `client/`.
+**Task 1-3: Setup Express and MongoDB Connection**
+- Configure `dotenv`, `cors`, and connect mongoose to MongoDB Atlas.
 
-**Step 2: Scaffold Express Server**
-Run: `mkdir server && cd server && npm init -y && npm install express mongoose cors dotenv && npm install -D typescript @types/express @types/node ts-node`
-Run: `npx tsc --init` inside `server/`.
-Expected: Express project setup in `server/`.
+**Task 1-4: Implement `verifyToken` Middleware**
+- Read `Authorization: Bearer <token>`, query session/user from DB, attach `req.user`.
 
-**Step 3: Commit**
-```bash
-git add .
-git commit -m "chore: scaffold separate client and server projects"
-```
+**Task 1-5: Setup Mongoose Models**
+- **User**: name, email, image, role, credits.
+- **Campaign**: title, story, category, funding_goal, min_contribution, deadline, reward_info, image_url, creator_email, creator_name, amount_raised, status.
+- **Contribution**: campaign_id, campaign_title, amount, supporter_email, supporter_name, creator_name, creator_email, date, status.
+- **Withdrawal**: creator_email, creator_name, withdrawal_credit, withdrawal_amount, payment_system, account_number, date, status.
+- **Notification**: message, toEmail, actionRoute, time.
+- **Report**: reporterName, campaignTitle, reason, date.
 
-### Task 2: Server Database & Authentication Middleware
+**Task 1-6 & 1-7 & 1-8: Client Auth Configuration**
+- Configure BetterAuth. Implement `session.ts` (`requireRole`) and `server.ts` (fetch wrappers with auth header). Ensure no redirect loops on private route reload.
 
-**Files:**
-- Create: `server/src/index.ts`
-- Create: `server/src/models/...` (User, Campaign, etc.)
+---
 
-**Step 1: Setup Express and MongoDB Connection**
-Create `server/src/index.ts` with basic Express setup, CORS, and mongoose/MongoDB connection.
+### Batch 2: Base UI & Authentication Pages
 
-**Step 2: Implement `verifyToken` Middleware**
-Inside `server/src/index.ts` (or a middleware file), write the `verifyToken` function that extracts `Authorization: Bearer <token>`, queries the `session` collection, finds the user, and attaches it to `req.user`.
+**Task 2-1: Setup Shadcn UI & Dependencies**
+- Install Shadcn components, Framer Motion (for animations), and Swiper.
 
-**Step 3: Setup Models**
-Create basic Mongoose schemas for Campaign, Contribution, Withdrawal, and Notification.
+**Task 2-2: Build Base Layouts (Navbar, Footer, Sidebar)**
+- **Navbar**: Not logged in (Explore, Login, Register, Join Dev). Logged in (Dashboard, Credits, Profile, Join Dev).
+- **Footer**: Logo, Social links.
+- **Sidebar**: Dashboard specific links based on role.
 
-**Step 4: Commit**
-```bash
-git add server/
-git commit -m "feat: server db connection and verifyToken middleware"
-```
+**Task 2-3: Build Auth Pages (/login, /register)**
+- **Register**: Form (Name, Email, Password, Role). imgBB image upload. Give 50 credits to Supporter, 20 to Creator (ensure given only once).
+- **Login**: Email/Pass and Google Sign-in. Redirect to dashboard.
 
-### Task 3: Client Authentication & Core Lib
+---
 
-**Files:**
-- Create: `client/src/lib/auth.ts`
-- Create: `client/src/lib/core/server.ts`
-- Create: `client/src/lib/core/session.ts`
+### Batch 3: Campaign Logic & Public Exploration
 
-**Step 1: Install & Configure BetterAuth**
-Install better-auth in `client/`. Setup `client/src/lib/auth.ts` connected to the shared MongoDB URI. Setup the `client/src/app/api/auth/[...all]/route.ts`.
+**Task 3-1: Implement Campaign API Routes (Express)**
+- GET/POST/PUT/DELETE `/api/campaigns`. Include logic for Advanced Search/Filter (category, deadline, funding goal).
 
-**Step 2: Implement `session.ts`**
-Create `client/src/lib/core/session.ts` with `getUserSession`, `getUserToken`, and `requireRole` functions (using Next.js `redirect`).
+**Task 3-2: Build Explore Campaigns Page (Client)**
+- Display approved campaigns where deadline hasn't passed. Add Search/Filter UI.
 
-**Step 3: Implement `server.ts`**
-Create `client/src/lib/core/server.ts` with `authHeader`, `serverMutation`, `serverFetch`, and `protectedFetch` functions to attach the Bearer token to Express backend requests.
+**Task 3-3: Build Campaign Details & Contribution Flow (Client)**
+- Campaign info + Contribution form. Submitting posts to `/api/contributions`.
 
-**Step 4: Commit**
-```bash
-git add client/src/lib/
-git commit -m "feat: client auth config and core fetch wrappers"
-```
+---
 
-### Task 4: Client Layouts & UI Components
+### Batch 4: Role-Based Dashboards
 
-**Files:**
-- Modify: `client/src/app/layout.tsx`
-- Create: `client/src/components/...` (Navbar, Footer, Sidebar)
+**Task 4-1: Implement Dashboard API Routes (Express)**
+- Endpoints for Contributions (approve/reject), Withdrawals, Users management, and Reporting. Add Pagination logic to `GET /api/contributions/supporter`.
 
-**Step 1: Setup Shadcn UI**
-Initialize shadcn in `client/`.
+**Task 4-2: Build Creator Dashboard Pages (Client)**
+- **Home**: Count, active, raised.
+- **Contributions to Review**: Approve (adds funds) / Reject (refunds).
+- **Add Campaign**: Form with imgBB upload.
+- **My Campaigns**: Edit/Delete (refunds supporters on delete).
+- **Withdrawals**: 20 credits = $1. Form (Stripe/Bkash).
 
-**Step 2: Build Layouts**
-Create a Base Layout (Navbar/Footer) and a Dashboard Layout (Sidebar dependent on `requireRole` logic).
+**Task 4-3: Build Supporter Dashboard Pages (Client)**
+- **Home**: Total contributions, pending, approved.
+- **My Contributions**: Tabular view with **Pagination**.
+- **Report Campaign**: UI to report fraudulent campaigns.
 
-**Step 3: Build Auth Pages**
-Implement `/login` and `/register` in Next.js using BetterAuth client APIs.
+**Task 4-4: Build Admin Dashboard Pages (Client)**
+- **Home**: Global stats.
+- **Campaign Approvals**: Approve/Reject.
+- **Withdrawal Requests**: Payment Success (deducts credits).
+- **Manage Users**: Update role, delete.
+- **Reports**: Suspend/Delete campaigns.
 
-**Step 4: Commit**
-```bash
-git add client/
-git commit -m "feat: client layouts, shadcn UI, and auth pages"
-```
+---
 
-### Task 5: Server API Routes
+### Batch 5: Payments, Notifications & Polish
 
-**Files:**
-- Create: `server/src/routes/...` (campaigns.ts, contributions.ts, etc.)
+**Task 5-1: Integrate Stripe Payment System**
+- `/api/payments/create-intent`. Packages ($10/100c, $25/300c, $60/800c, $110/1500c). Update credits post-payment.
 
-**Step 1: Implement Campaign Routes**
-Write GET/POST routes for campaigns in Express, protected by `verifyToken` where necessary.
+**Task 5-2: Implement Notification & Email System**
+- Backend: Insert to Notification collection on approvals, rejections, new contributions. Optionally trigger email via SendGrid/SES.
+- Frontend: Floating pop-up in Navbar reading notifications.
 
-**Step 2: Implement Dashboards Logic**
-Write endpoints for contributions, approvals, and withdrawals.
+**Task 5-3: Build Home Page (Hero Slider, Top Funded, Testimonials)**
+- Use Swiper and Framer Motion. Ensure no Lorem Ipsum. Minimum 3 extra sections.
 
-**Step 3: Commit**
-```bash
-git add server/src/routes/
-git commit -m "feat: implement express api routes"
-```
-
-### Task 6: Client Dashboards Integration
-
-**Files:**
-- Create: `client/src/app/dashboard/...`
-
-**Step 1: Creator Dashboard**
-Build pages using `serverMutation` and `serverFetch` to interact with the Express API for managing campaigns and withdrawals. Use `requireRole("creator")`.
-
-**Step 2: Supporter & Admin Dashboards**
-Build pages for tracking contributions and admin approvals, protected by `requireRole`.
-
-**Step 3: Commit**
-```bash
-git add client/src/app/dashboard/
-git commit -m "feat: implement client dashboard pages"
-```
+**Task 5-4: Final Responsive Design Polish & README**
+- Verify mobile/tablet responsiveness. Ensure 20 client / 12 server commits.
+- Create README.md with required details.
