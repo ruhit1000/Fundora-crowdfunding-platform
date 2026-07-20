@@ -37,6 +37,7 @@ lerna-debug.log*
 .vscode
 *.swp
 *.swo
+.agent
 
 # Typescript
 *.tsbuildinfo
