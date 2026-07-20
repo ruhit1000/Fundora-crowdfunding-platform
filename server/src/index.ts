@@ -9,6 +9,11 @@ const app = express();
 const port = process.env.PORT || 8000;
 
 app.use(cors());
+
+// Stripe Webhook MUST come before express.json() to parse raw body
+import { handleWebhook } from "./controllers/paymentController";
+app.post("/api/payments/webhook", express.raw({ type: "application/json" }), handleWebhook);
+
 app.use(express.json());
 
 // Database Connection
@@ -66,9 +71,13 @@ export const verifyToken = async (
 
 import campaignRoutes from "./routes/campaignRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
+import paymentRoutes from "./routes/paymentRoutes";
+import notificationRoutes from "./routes/notificationRoutes";
 
 app.use("/api/campaigns", campaignRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 app.get("/health", (req, res) => {
   res.json({ status: "healthy", dbState: mongoose.connection.readyState });

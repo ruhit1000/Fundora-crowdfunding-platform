@@ -2,6 +2,7 @@ import { Response } from "express";
 import mongoose from "mongoose";
 import { Campaign } from "../models/Campaign";
 import { Contribution } from "../models/Contribution";
+import { Notification } from "../models/Notification";
 import { AuthenticatedRequest } from "../index";
 
 export const getCreatorDashboard = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -135,6 +136,14 @@ export const updateCampaignStatus = async (req: AuthenticatedRequest, res: Respo
       res.status(404).json({ message: "Campaign not found" });
       return;
     }
+
+    // Send notification to creator
+    const notification = new Notification({
+      message: `Your campaign "${campaign.title}" has been ${status}.`,
+      toEmail: campaign.creator_email,
+      actionRoute: `/campaigns/${campaign._id}`,
+    });
+    await notification.save();
 
     res.json(campaign);
   } catch (error: any) {

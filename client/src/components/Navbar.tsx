@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, Menu } from "lucide-react";
 import { useState } from "react";
+import { NotificationDropdown } from "./NotificationDropdown";
 
 export function Navbar() {
   const { data: session, isPending } = authClient.useSession();
@@ -63,6 +64,8 @@ export function Navbar() {
               <Link href={`/dashboard/${(session.user as any).role || 'supporter'}`}>
                 <Button variant="outline" size="sm">Dashboard</Button>
               </Link>
+              
+              <NotificationDropdown />
               
               <DropdownMenu>
                 <DropdownMenuTrigger>

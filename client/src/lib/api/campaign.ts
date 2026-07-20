@@ -46,16 +46,17 @@ export const getCampaignById = async (id: string) => {
 export const contributeToCampaign = async (id: string, amount: number, reward_selected?: string) => {
   const headers = await getAuthHeaders();
   
-  const res = await fetch(`${API_URL}/api/campaigns/${id}/contribute`, {
+  const res = await fetch(`${API_URL}/api/payments/create-checkout-session`, {
     method: "POST",
     headers,
-    body: JSON.stringify({ amount, reward_selected }),
+    body: JSON.stringify({ campaignId: id, amount, reward: reward_selected }),
   });
 
   const data = await res.json();
   if (!res.ok) {
-    throw new Error(data.message || "Failed to contribute");
+    throw new Error(data.message || "Failed to create payment session");
   }
   
+  // Return the Stripe checkout URL to redirect to
   return data;
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ interface Campaign {
 export default function CampaignDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [loading, setLoading] = useState(true);
   const { data: session } = authClient.useSession();
@@ -49,7 +50,15 @@ export default function CampaignDetailsPage() {
       }
     };
     if (id) fetchCampaign();
-  }, [id]);
+    
+    // Check Stripe redirect status
+    if (searchParams.get("success")) {
+      setSuccess(true);
+    }
+    if (searchParams.get("canceled")) {
+      setError("Payment was canceled. You have not been charged.");
+    }
+  }, [id, searchParams]);
 
   const handleContribute = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,14 +78,15 @@ export default function CampaignDetailsPage() {
 
     try {
       const data = await contributeToCampaign(id as string, amount, campaign?.reward_info);
-      setSuccess(true);
-      if (campaign) {
-        setCampaign({ ...campaign, amount_raised: data.amount_raised });
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setError("Could not redirect to payment provider.");
+        setContributing(false);
       }
     } catch (err: unknown) {
       const e = err as Error;
       setError(e.message || "An unexpected error occurred");
-    } finally {
       setContributing(false);
     }
   };
