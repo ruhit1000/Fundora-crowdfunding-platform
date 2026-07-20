@@ -16,7 +16,7 @@ export const getUserSession = async (): Promise<AuthUser | null> => {
     headers: await headers(),
   });
 
-  return (session?.user as AuthUser) || null;
+  return (session?.user as unknown as AuthUser) || null;
 };
 
 export const getUserToken = async (): Promise<string | null> => {
