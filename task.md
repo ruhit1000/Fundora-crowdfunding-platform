@@ -16,10 +16,10 @@
 | batch-3-1 | Implement Campaign API Routes (Express) | completed | |
 | batch-3-2 | Build Explore Campaigns Page (Client) | completed | |
 | batch-3-3 | Build Campaign Details & Contribution Flow (Client) | completed | |
-| batch-4-1 | Implement Dashboard API Routes (Express) | pending | |
-| batch-4-2 | Build Creator Dashboard Pages (Client) | pending | |
-| batch-4-3 | Build Supporter Dashboard Pages (Client - inc. Pagination) | pending | |
-| batch-4-4 | Build Admin Dashboard Pages (Client) | pending | |
+| batch-4-1 | Implement Dashboard API Routes (Express) | completed | |
+| batch-4-2 | Build Creator Dashboard Pages (Client) | in_progress | |
+| batch-4-3 | Build Supporter Dashboard Pages (Client - inc. Pagination) | in_progress | |
+| batch-4-4 | Build Admin Dashboard Pages (Client) | in_progress | |
 | batch-5-1 | Integrate Stripe Payment System | pending | |
 | batch-5-2 | Implement Notification System (Backend & Frontend) | pending | |
 | batch-5-3 | Build Home Page (Hero Slider, Top Funded, Testimonials) | pending | |

@@ -119,9 +119,8 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <Label htmlFor="role">I want to...</Label>
-              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-              <Select value={role} onValueChange={(val: any) => val && setRole(val)}>
-                <SelectTrigger>
+              <Select value={role} onValueChange={(val) => val && setRole(val as "creator" | "supporter")}>
+                <SelectTrigger id="role" className="w-full">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>

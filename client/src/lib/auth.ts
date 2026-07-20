@@ -1,5 +1,4 @@
 import { betterAuth } from "better-auth";
-import { admin } from "better-auth/plugins";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { MongoClient } from "mongodb";
 
@@ -17,7 +16,20 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     },
   },
-  plugins: [
-    admin() // Used to set roles (admin/creator/supporter)
-  ]
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: true,
+        defaultValue: "supporter",
+        input: true // Allows it to be set during sign-up
+      },
+      credits: {
+        type: "number",
+        required: false,
+        defaultValue: 50,
+        input: true
+      }
+    }
+  }
 });
